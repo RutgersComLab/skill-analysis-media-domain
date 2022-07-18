@@ -96,7 +96,7 @@ Repeat the following steps for each year to perform Cluster Evolution:
 
 Repeat the above steps for each ONET we want to analyze. The code for this section is available [here](code/Skill%20Trend%20Analysis.ipynb), and results can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/).
 
-> We take a similar approach for the sub-analysis as well. The query and data for that can be viewed [here](Top%2025%20skills%20for%20Sub%20Analysis%20\(By%20Year%20and%20ONET%20%7C%20with%20NAICS%20filter\).xlsx).
+> We take a similar approach for the sub-analysis. The query and data for that can be viewed [here](data/Top%2025%20skills%20for%20Sub%20Analysis%20\(By%20Year%20and%20ONET%20%7C%20with%20NAICS%20filter\).xlsx).
 
 ### Visualization
 We build 3 different visualizations on top of the results:
