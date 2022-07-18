@@ -96,6 +96,8 @@ Repeat the following steps for each year to perform Cluster Evolution:
 
 Repeat the above steps for each ONET we want to analyze. The code for this section is available [here](code/Skill%20Trend%20Analysis.ipynb), and results can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/).
 
+> We take a similar approach for the sub-analysis as well. The query and data for that can be viewed [here](Top%2025%20skills%20for%20Sub%20Analysis%20\(By%20Year%20and%20ONET%20%7C%20with%20NAICS%20filter\).xlsx).
+
 ### Visualization
 We build 3 different visualizations on top of the results:
 <ol>
@@ -104,7 +106,7 @@ We build 3 different visualizations on top of the results:
 	<li>Bar chart - A plot consisting of 10 subplots (2010-2021), each showing the frequency of clusters within a year. Can be used to identify which cluster was the most important each year.</li>
 </ol>
 
-All these visualizations can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/)
+All these visualizations can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/).
 
 ## Results
 In this section, we will discuss the results of the analysis:
