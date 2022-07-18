@@ -1,7 +1,7 @@
 # Identifying trends in the the US media industry
 
 ## Overview
-In this project, we try to identify how the skill requirements have changed within the US media domain in the past decade. We use the USA Labor Insight dataset provided by (Lightcast)[https://www.economicmodeling.com/] (formerly known as Burning Glass Technologies) to perform the analysis. The dataset is a text dump of 5 entities - main, certifications, cip, degree, major, and skills - amounting to more than 100 GB in size. It holds data from 2010 to 2021 as well as data from 2007, and each record holds information about a particular job posting. We use [PySpark](https://spark.apache.org/docs/latest/api/python/) to process and save the data as [Parquet](https://parquet.apache.org/), before loading it into [Amazon Redshift](https://aws.amazon.com/redshift/). We also employ the use of different techniques and packages such as [Sentence Transformers](https://github.com/UKPLab/sentence-transformers) and [Clustering](https://scikit-learn.org/stable/modules/clustering.html) along with other popular python packages to find insights in the data.
+In this project, we try to identify how the skill requirements have changed within the US media domain in the past decade. We use the USA Labor Insight dataset provided by [Lightcast](https://www.economicmodeling.com/) (formerly known as Burning Glass Technologies) to perform the analysis. The dataset is a text dump of 5 entities - main, certifications, cip, degree, major, and skills - amounting to more than 100 GB in size. It holds data from 2010 to 2021 as well as data from 2007, and each record holds information about a particular job posting. We use [PySpark](https://spark.apache.org/docs/latest/api/python/) to process and save the data as [Parquet](https://parquet.apache.org/), before loading it into [Amazon Redshift](https://aws.amazon.com/redshift/). We also employ the use of different techniques and packages such as [Sentence Transformers](https://github.com/UKPLab/sentence-transformers) and [Clustering](https://scikit-learn.org/stable/modules/clustering.html) along with other popular python packages to find insights in the data.
 
 ## Objective
 The objective is to identify how the skill requirements for different jobs in the US media domain has changed in the past decade. We try to get a sense of which skills were discarded and what new skills were adopted for particular occupation domains. We concentrate on the following occupation groups:
@@ -75,10 +75,36 @@ limit 25
 ```
 The full query, as well as the output can be viewed [here](data/Top%2025%20skills%20\(By%20Year%20and%20ONET%20_%20with%20NAICS%20filter\).xlsx).
 
-#### 2. Clustering
+#### 2. Cluster Analysis
+We can think about this as having two components - Clustering and Cluster Evolution. Clustering can be thought of as plotting the skills into an n-dimensional space, and Cluster Evolution helps in identifying how these clusters have changed over the years. The steps involved in Clustering are as follows:
+<ol>
+	<li>Get all the skills related to a single ONET code across all years. For example, 'get all the skills associated with ONET 15 from 2010 to 2021'.</li>
+	<li>Convert the skills into dense vector embeddings. Dense vectors are numerical representations of semantic meaning. Words are encoded into high-dimensional vectors, and the abstract meaning and relationship of words are numerically encoded.</li>
+	<ul>
+		<li>The first approach was using Word2Vec pre-trained models. Both of these failed to create the embeddings as some of the skills were out of vocabulary (OOV) for those models. Some of the examples for the OOV words were 'Web Development' and 'Microsoft Excel'. The models tried were 'conceptnet-numberbatch-17-06-300' and 'word2vec-google-news-300', which are two of the biggest provided by Gensim.</li>
+		<li>The second approach was using Sentence Transformers to create the dense vector representations. This works as expected and we are able to represent all the skills as vector embeddings.</li>
+	</ul>
+	<li>Once the embeddings have been created, we use k-means clustering to train a model. This model helps in mapping the embeddings onto a space, and identify clusters in them. We calculate the Silhouette Score to get a sense of how good the clusters generated are.</li>
+	<li>Save the clusters as a JSON file for future reference.</li>
+</ol>
+Repeat the following steps for each year to perform Cluster Evolution:
+<ol>
+	<li>Get all the skills related to a single ONET code in a particular year. For example, 'get all the skills associated with ONET 15 for the year 2010'.</li>
+	<li>Assign each skill to the space we created earlier by predicting its closest cluster.</li>
+	<li>For each cluster, get the total number of times all the skills part of the cluster was asked for. This gives us a measure of how demanding a particular skill cluster is in a particular year.</li>
+</ol>
+
+Repeat the above steps for each ONET we want to analyze. The code for this section is available [here](code/Skill%20Trend%20Analysis.ipynb), and results can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/).
 
 ### Visualization
-We also build a visualization on top of the results.
+We build 3 different visualizations on top of the results:
+<ol>
+	<li>Bubble chart - A bubble chart representation of how each cluster has changed across the years. The bubbles represent a cluster and the size is a measure of how interesting it was for that year.</li>
+	<li>Line chart - To be used along with the cluster data saved as json. This plot is a line chart showing how each cluster has changed across the years. Can be filtered by double-clicking the legend to the right. You can get more information by hovering over each point.</li>
+	<li>Bar chart - A plot consisting of 10 subplots (2010-2021), each showing the frequency of clusters within a year. Can be used to identify which cluster was the most important each year.</li>
+</ol>
+
+All these visualizations can be viewed [here](https://github.com/jacobceles/skill-analysis-media-domain/tree/main/results/)
 
 ## Results
 In this section, we will discuss the results of the analysis:
@@ -87,34 +113,14 @@ In this section, we will discuss the results of the analysis:
 ## Packages/References/Credits
 Item | Link
 --- | ---
-LDA | https://radimrehurek.com/gensim/models/ldamodel.html
-LDASeq | https://radimrehurek.com/gensim/models/ldaseqmodel.html
-BERTopic | https://github.com/MaartenGr/BERTopic/
-BERTopic-DTM | https://github.com/MaartenGr/BERTopic/#dynamic-topic-modeling
-NLTK | https://www.nltk.org/
-Gensim | https://radimrehurek.com/gensim/
-spaCy | https://spacy.io/
+Lightcast (formerly known as Burning Glass Technologies) | https://www.economicmodeling.com/
+Sentence Transformers | https://github.com/UKPLab/sentence-transformers
+Gensim Models | https://github.com/RaRe-Technologies/gensim-data#models
+Amazon Redshift | https://aws.amazon.com/redshift/
+matplotlib | https://matplotlib.org/
 Plotly | https://plotly.com/
 Pandas | https://pandas.pydata.org/
 Numpy | https://numpy.org/
-Haystack | https://haystack.deepset.ai/overview/intro
 scikit-learn | https://scikit-learn.org/stable/index.html
-pyLDAvis | https://github.com/bmabey/pyLDAvis
-The New York Times | https://www.nytimes.com/
-ProQuest | https://www.proquest.com/
-
-[lda]:https://radimrehurek.com/gensim/models/ldamodel.html
-[lda_Seq]:https://radimrehurek.com/gensim/models/ldaseqmodel.html
-[bertopic]:https://github.com/MaartenGr/BERTopic/
-[bertopic_dtm]:https://github.com/MaartenGr/BERTopic/#dynamic-topic-modeling
-[nltk]:https://www.nltk.org/
-[gensim]:https://radimrehurek.com/gensim/
-[spacy]:https://spacy.io/
-[plotly]:https://plotly.com/
-[pandas]:https://pandas.pydata.org/
-[numpy]:https://numpy.org/
-[haystack]:https://haystack.deepset.ai/overview/intro
-[scikit_learn]:https://scikit-learn.org/stable/index.html
-[pyldavis]:https://github.com/bmabey/pyLDAvis
-[nyt]:https://www.nytimes.com/
-[proquest]:https://www.proquest.com/
+PySpark | https://spark.apache.org/docs/latest/api/python/
+Parquet | https://parquet.apache.org/
