@@ -56,7 +56,7 @@ Skills             |  Main
 
 We use [PySpark](https://spark.apache.org/docs/latest/api/python/) to load the data and perfrom basic EDA on them. This gives us information such as record count, skewness in the data, how the tables are normalized, what columns are available etc. We also create a few columns like day, month, and year. Finally, we partition the data by year and save it in [Parquet](https://parquet.apache.org/) file format. We use Parquet as it is optimized to work with complex data in bulk and uses one of the best compression techniques available. It also minimizes the IO by reading only the required columns and partitions. Redshift makes it easy to create external tables on top of Paarquet, thereby making it an ideal candidate. A screenshot of the final raw layer is given below:
 
-![Raw Layer](screenshots/raw%20layer.png?raw=true "Raw Layer")
+<img src="https://github.com/jacobceles/skill-analysis-media-domain/blob/78ed41f49038a2ebdb5280d9ed151bfee2fe8e96/screenshots/raw%20layer.png" alt="Raw Layer" width=50% height=20%>
 
 ### Clustering Skills
 Once we have identified the subset of data to use for the anlaysis, the next step is to create job skill clusters and understand how they have evolved over time. A combination of year, ONET, and NAICS gives us the right subset of the data to perfrom the analysis on. Since we want to represent occupation domains, we do the clustering on an ONET level. The clustering itself can be broadly split into two parts:
