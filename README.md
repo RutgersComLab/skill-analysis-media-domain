@@ -73,7 +73,7 @@ group by onet, skill
 ORDER BY count DESC
 limit 25
 ```
-The full query, as well as the output can be viewed [here](Top%2025%20skills%20%28By%20Year%20and%20ONET%20_%20with%20NAICS%20filter%29.xlsx).
+The full query, as well as the output can be viewed [here](Top%2025%20skills%20\(By%20Year%20and%20ONET%20_%20with%20NAICS%20filter\).xlsx).
 
 #### 2. Clustering
 
