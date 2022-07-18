@@ -3,7 +3,7 @@
 ## Overview
 In this project, we try to identify how the skill requirements have changed within the US media domain in the past decade. We use the USA Labor Insight dataset provided by (Lightcast)[https://www.economicmodeling.com/] (formerly known as Burning Glass Technologies) to perform the analysis. The dataset is a text dump of 5 entities - main, certifications, cip, degree, major, and skills - amounting to more than 100 GB in size. It holds data from 2010 to 2021 as well as data from 2007, and each record holds information about a particular job posting. We use [PySpark](https://spark.apache.org/docs/latest/api/python/) to process and save the data as [Parquet](https://parquet.apache.org/), before loading it into [Amazon Redshift](https://aws.amazon.com/redshift/). We also employ the use of different techniques and packages such as [Sentence Transformers](https://github.com/UKPLab/sentence-transformers) and [Clustering](https://scikit-learn.org/stable/modules/clustering.html) along with other popular python packages to find insights in the data.
 
-## Problem Statements
+## Objective
 The objective is to identify how the skill requirements for different jobs in the US media domain has changed in the past decade. We try to get a sense of which skills were discarded and what new skills were adopted for paricular occupation domains. We concentrate on the following occupation groups:
 
 | ONET Code | Occupation Group  |
@@ -29,12 +29,13 @@ We also run a sub-analysis for news media by loooking at the trends for the foll
 | 27-2012.05 | Media Technical Directors/Managers |
 
 ## Implementation
-For our analsyis, we use the main and skills tables, with data ranging from 2010 to 2021. The main table holds the core details regarding the job posting such as title, onet, employer, sector, naics, location, education, degree, experience, salary_type etc. Skills table holds information about what skills are required for each job. The implementation consists of the following stages:
+For our analsyis, we use the main and skills tables, with data ranging from 2010 to 2021. The main table holds the core details regarding the job posting such as title, onet, employer, sector, naics, location, education, degree, experience, salary type etc. Skills table holds information about what skills are required for each job. Both main and skills exists in normalized from. The implementation consists of the following stages:
 <ol>
-	<li>Load the raw text files into a relational DB.</li>
+	<li>Load the raw text files into a relational DB (Amazon Redshift).</li>
 	<li>Identify filters that gives the data realted to 'Journalism and Media' category.</li>
 	<ul>
-		<li>The relevant filters were identified as NAICS, ONET, and Year columns.</li>
+		<li>Create two denormalized tables using main and skills, as well as main and certifications.</li>
+		<li>From these, we identify the relevant filters as NAICS, ONET, and Year columns.</li>
 	</ul>
 	<li>Identify job skill clusters using Cluster analysis for each identified ONET code.</li>
 	<ul>
@@ -46,13 +47,16 @@ For our analsyis, we use the main and skills tables, with data ranging from 2010
 </ol>
 Some of these stages are discussed below:
 
-### Loading the raw data to a relational DB
+### Loading the Raw data into a Relational DB
+The raw data is available as text files and the has the format shown below:
 
 Skills             |  Main
 :-------------------------:|:-------------------------:
-![Skills_raw file](data/raw/skills.png?raw=true "Skills_raw file")  |  !![Main_raw file](data/raw/main.png?raw=true "Main_raw file")
+![Skills_raw file](screenshots/raw/skills.png?raw=true "Skills_raw file")  |  ![Main_raw file](screenshots/raw/main.png?raw=true "Main_raw file")
 
+We use [PySpark](https://spark.apache.org/docs/latest/api/python/) to load the data and perfrom basic EDA on them. This gives us information such as record count, skewness in the data, how the tables are normalized, what columns are available etc. We also create a few columns like day, month, and year. Finally, we partition the data by year and save it in [Parquet](https://parquet.apache.org/) file format. We use Parquet as it is optimized to work with complex data in bulk and uses one of the best compression techniques available. It also minimizes the IO by reading only the required columns and partitions. Redshift makes it easy to create external tables on top of Paarquet, thereby making it an ideal candidate. A screenshot of the final raw layer is given below:
 
+![Raw Layer](screenshots/raw/raw%20layer.png?raw=true "Raw Layer")
 
 
 ### Clustering the skills
